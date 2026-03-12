@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tool Grimoire - Find the right AI tool in seconds</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      background-color: #000000;
+      font-family: 'Montserrat', sans-serif;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Main Content */
+    .main-content {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 20px;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Logo */
+    .logo {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 72px;
+      font-weight: 400;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      letter-spacing: -8px;
+    }
+
+    .bracket {
+      color: #ffffff;
+    }
+
+    .slash {
+      color: #7C3AED;
+      transform: rotate(-12deg);
+      display: inline-block;
+      margin: 0 -2px;
+    }
+
+    /* Badge */
+    .tools-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 400;
+      margin-bottom: 28px;
+    }
+
+    .badge-icon {
+      color: #7C3AED;
+    }
+
+    /* Headline */
+    .headline {
+      font-size: 52px;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.15;
+      margin: 0 0 24px 0;
+    }
+
+    .headline-accent {
+      color: #7C3AED;
+    }
+
+    /* Subtitle */
+    .subtitle {
+      color: #777777;
+      font-size: 18px;
+      font-weight: 300;
+      font-style: italic;
+      margin: 0 0 40px 0;
+      max-width: 500px;
+    }
+
+    /* Search Bar */
+    .search-bar {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 50px;
+      padding: 18px 28px;
+      width: 100%;
+      max-width: 480px;
+      margin-bottom: 32px;
+      transition: border-color 0.2s;
+    }
+
+    .search-bar:focus-within {
+      border-color: #7C3AED;
+    }
+
+    .search-icon {
+      color: #555555;
+      flex-shrink: 0;
+    }
+
+    .search-input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #ffffff;
+      font-size: 15px;
+      font-family: 'Montserrat', sans-serif;
+      width: 100%;
+    }
+
+    .search-input::placeholder {
+      color: #555555;
+    }
+
+    /* Tags */
+    .tags-row {
+      display: flex;
+      gap: 32px;
+      margin-bottom: 48px;
+    }
+
+    .tag {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #777777;
+      font-size: 14px;
+    }
+
+    .tag-icon {
+      color: #7C3AED;
+    }
+
+    /* Accent Line */
+    .accent-line {
+      width: 60px;
+      height: 3px;
+      background-color: #7C3AED;
+      border-radius: 2px;
+    }
+
+    /* Footer */
+    .site-footer {
+      padding: 24px 20px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      text-align: center;
+      font-size: 14px;
+      color: #888;
+    }
+    .site-footer a {
+      color: #7C3AED;
+      text-decoration: none;
+    }
+    .site-footer a:hover { text-decoration: underline; }
+
+    /* Star decorations - purple diamonds */
+    .star {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background-color: #7C3AED;
+      transform: rotate(45deg);
+      z-index: 1;
+    }
+
+    .star-sm {
+      width: 5px;
+      height: 5px;
+    }
+
+    .star-lg {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .headline {
+        font-size: 36px;
+      }
+      
+      .logo {
+        font-size: 56px;
+      }
+      
+      .subtitle {
+        font-size: 16px;
+        padding: 0 20px;
+      }
+      
+      .search-bar {
+        max-width: 90%;
+      }
+      
+      .tags-row {
+        flex-direction: column;
+        gap: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Decorative Stars -->
+  <div class="star" style="top: 5%; left: 8%;"></div>
+  <div class="star star-lg" style="top: 10%; right: 15%;"></div>
+  <div class="star star-sm" style="top: 18%; left: 5%;"></div>
+  <div class="star" style="top: 25%; right: 8%;"></div>
+  <div class="star star-sm" style="top: 35%; left: 3%;"></div>
+  <div class="star" style="top: 45%; right: 5%;"></div>
+  <div class="star star-lg" style="top: 55%; left: 6%;"></div>
+  <div class="star star-sm" style="top: 65%; right: 10%;"></div>
+  <div class="star" style="top: 75%; left: 10%;"></div>
+  <div class="star star-lg" style="top: 80%; right: 6%;"></div>
+  <div class="star star-sm" style="top: 88%; left: 4%;"></div>
+  <div class="star" style="top: 92%; right: 12%;"></div>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Logo -->
+    <div class="logo">
+      <span class="bracket">&lt;</span>
+      <span class="slash">/</span>
+      <span class="bracket">&gt;</span>
+    </div>
+
+    <!-- Badge -->
+    <div class="tools-badge">
+      <span class="badge-icon">↗</span>
+      <span>400+ AI Tools Curated</span>
+    </div>
+
+    <!-- Headline -->
+    <h1 class="headline">
+      Find the right AI tool
+      <br>
+      <span class="headline-accent">in seconds</span>
+    </h1>
+
+    <!-- Subtitle -->
+    <p class="subtitle">
+      Your curated map of the best AI tools — updated, organized, simple.
+    </p>
+
+    <!-- Search Bar -->
+    <form class="search-bar" action="#" method="get">
+      <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+      <input 
+        type="text" 
+        name="search"
+        placeholder="Search across 400+ AI tools..."
+        class="search-input"
+      >
+    </form>
+
+    <!-- Tags -->
+    <div class="tags-row">
+      <span class="tag">
+        <span class="tag-icon">⚡</span>
+        Free & Paid Options
+      </span>
+      <span class="tag">
+        <span class="tag-icon">✦</span>
+        2026 Hottest Tools
+      </span>
+    </div>
+
+    <!-- Purple Line -->
+    <div class="accent-line"></div>
+  </main>
+  <footer class="site-footer">
+    <a href="/terms.html">Terms of Service</a> · <a href="/privacy.html">Privacy Policy</a><br>
+    Support: <a href="mailto:toolgrimoire@outlook.com">toolgrimoire@outlook.com</a><br>
+    © 2026 ToolGrimoire. All rights reserved.
+  </footer>
+</body>
+</html>

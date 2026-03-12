@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pricing – ToolGrimoire</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      background-color: #000000;
+      font-family: 'Montserrat', sans-serif;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+    }
+    .nav {
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .nav a {
+      color: #888;
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+    .nav a:hover { color: #fff; }
+    .nav .brand { color: #7C3AED; font-weight: 600; }
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 20px;
+    }
+    .pricing-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 48px 40px;
+      max-width: 560px;
+      width: 100%;
+      text-align: center;
+    }
+    .pricing-card h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .pricing-card .price {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #7C3AED;
+      margin: 24px 0 32px;
+    }
+    .pricing-card ul {
+      list-style: none;
+      text-align: left;
+      color: #b0b0b0;
+      font-size: 0.95rem;
+      line-height: 1.8;
+      margin-bottom: 32px;
+      padding-left: 0;
+      display: block;
+      margin-left: 0;
+      margin-right: auto;
+    }
+    .pricing-card ul li {
+      display: flex;
+      align-items: flex-start;
+      text-align: left;
+    }
+    .pricing-card ul li::before {
+      content: "✓ ";
+      color: #7C3AED;
+      font-weight: 700;
+      margin-right: 8px;
+      flex-shrink: 0;
+    }
+    .btn-buy {
+      display: inline-block;
+      background: #7C3AED;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      padding: 16px 32px;
+      border-radius: 50px;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .btn-buy:hover {
+      background: #6d28d9;
+      transform: translateY(-2px);
+    }
+    .pricing-card .billing-note {
+      font-size: 0.8rem;
+      color: #666;
+      margin-top: 12px;
+    }
+    footer {
+      padding: 24px 20px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      text-align: center;
+      font-size: 14px;
+      color: #888;
+    }
+    footer a {
+      color: #7C3AED;
+      text-decoration: none;
+    }
+    footer a:hover { text-decoration: underline; }
+    @media (max-width: 768px) {
+      .pricing-card { padding: 32px 24px; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <a href="/" class="brand">ToolGrimoire</a>
+    <a href="/#tools">Browse Tools</a>
+    <a href="/#categories">Categories</a>
+    <a href="/pricing.html">Pricing</a>
+  </nav>
+  <main>
+    <div class="pricing-card">
+      <h1>ToolGrimoire Access</h1>
+      <p style="color:#777;">Your shortcut to the entire AI tools landscape</p>
+      <div class="price">€7 / month</div>
+      <ul>
+        <li>400+ handpicked AI tools across 12+ categories</li>
+        <li>Updated weekly with new launches and hidden gems</li>
+        <li>Covers both mainstream and underground tools</li>
+        <li>Find the right tool in seconds, not hours</li>
+      </ul>
+      <a href="https://creem.io" class="btn-buy" target="_blank" rel="noopener">Get Access</a>
+      <p class="billing-note">Billed monthly. Cancel anytime.</p>
+    </div>
+  </main>
+  <footer>
+    <a href="/terms.html">Terms of Service</a> · <a href="/privacy.html">Privacy Policy</a><br>
+    Support: <a href="mailto:toolgrimoire@outlook.com">toolgrimoire@outlook.com</a><br>
+    © 2026 ToolGrimoire. All rights reserved.
+  </footer>
+</body>
+</html>
