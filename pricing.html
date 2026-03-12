@@ -181,19 +181,28 @@
       margin-top: 12px;
     }
     footer {
-      padding: 24px 20px;
-      border-top: 1px solid rgba(255,255,255,0.08);
+      padding: 28px 20px;
+      border-top: 1px solid rgba(255,255,255,0.12);
       text-align: center;
       font-size: 14px;
-      color: #888;
+      color: #b0b0b0;
       position: relative;
       z-index: 1;
     }
     footer a {
-      color: #7C3AED;
+      color: #a78bfa;
       text-decoration: none;
     }
-    footer a:hover { text-decoration: underline; }
+    footer a:hover { text-decoration: underline; color: #c4b5fd; }
+    footer .footer-links {
+      margin-bottom: 12px;
+      line-height: 1.6;
+    }
+    footer .footer-copy {
+      color: #999;
+      font-size: 13px;
+      margin: 0;
+    }
     @media (max-width: 768px) {
       .pricing-card { padding: 32px 24px; }
       .pricing-card .price { font-size: 2.75rem; }
@@ -225,9 +234,11 @@
     </div>
   </main>
   <footer>
-    <a href="/terms.html">Terms of Service</a> · <a href="/privacy.html">Privacy Policy</a><br>
-    Support: <a href="mailto:toolgrimoire@outlook.com">toolgrimoire@outlook.com</a><br>
-    © 2026 ToolGrimoire. All rights reserved.
+    <p class="footer-links">
+      <a href="/terms.html">Terms of Service</a> · <a href="/privacy.html">Privacy Policy</a><br>
+      Support: <a href="mailto:toolgrimoire@outlook.com">toolgrimoire@outlook.com</a>
+    </p>
+    <p class="footer-copy">© 2026 ToolGrimoire. All rights reserved.</p>
   </footer>
 </body>
 </html>
