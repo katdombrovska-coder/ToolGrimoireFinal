@@ -3727,9 +3727,7 @@ html {
               overlay.className = 'tg-lock-overlay';
               overlay.innerHTML = '<svg class="tg-lock-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>' +
                 '<span class="tg-lock-text">Unlock full access to browse all tools</span>' +
-                (currentUser ? '<a href="' + CREEM_PAYMENT_URL + '" class="tg-btn-get-access" target="_blank" rel="noopener">Get Access</a>' : '<button type="button" class="tg-btn-unlock">Unlock Full Access</button>');
-              const btn = overlay.querySelector('.tg-btn-unlock');
-              if (btn) btn.addEventListener('click', function(e) { e.preventDefault(); openAuthModal(); });
+                (currentUser ? '<a href="' + CREEM_PAYMENT_URL + '" class="tg-btn-get-access" target="_blank" rel="noopener">Get Access</a>' : '<a href="/pricing.html" class="tg-btn-unlock">Unlock Full Access</a>');
               return overlay;
             }
 
