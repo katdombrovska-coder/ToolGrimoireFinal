@@ -14,6 +14,21 @@
       color: #ffffff;
       display: flex;
       flex-direction: column;
+      position: relative;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(124, 58, 237, 0.15) 0%, rgba(88, 28, 135, 0.08) 40%, transparent 70%);
+      animation: bg-glow 12s ease-in-out infinite alternate;
+      pointer-events: none;
+      z-index: 0;
+    }
+    @keyframes bg-glow {
+      0% { opacity: 0.8; transform: scale(1) translate(0, 0); }
+      100% { opacity: 1; transform: scale(1.1) translate(2%, -3%); }
     }
     .nav {
       padding: 20px 24px;
@@ -23,6 +38,8 @@
       justify-content: center;
       gap: 24px;
       flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
     }
     .nav a {
       color: #888;
@@ -38,15 +55,62 @@
       align-items: center;
       justify-content: center;
       padding: 48px 20px;
+      position: relative;
+      z-index: 1;
     }
     .pricing-card {
       background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.08);
+      border: 1px solid rgba(124, 58, 237, 0.4);
       border-radius: 16px;
       padding: 48px 40px;
       max-width: 560px;
       width: 100%;
       text-align: center;
+      position: relative;
+      box-shadow: 0 0 30px rgba(124, 58, 237, 0.2);
+      animation: border-pulse 3s ease-in-out infinite;
+      overflow: hidden;
+    }
+    .pricing-card::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 17px;
+      padding: 1px;
+      background: linear-gradient(90deg, transparent, rgba(167, 139, 250, 0.4), transparent, rgba(124, 58, 237, 0.4), transparent);
+      background-size: 200% 100%;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.4s;
+      pointer-events: none;
+    }
+    .pricing-card:hover::before {
+      opacity: 1;
+      animation: shimmer 1.5s linear infinite;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    @keyframes border-pulse {
+      0%, 100% { box-shadow: 0 0 30px rgba(124, 58, 237, 0.2); border-color: rgba(124, 58, 237, 0.4); }
+      50% { box-shadow: 0 0 45px rgba(124, 58, 237, 0.35); border-color: rgba(124, 58, 237, 0.6); }
+    }
+    .badge-popular {
+      display: inline-block;
+      background: linear-gradient(135deg, #a78bfa 0%, #7C3AED 100%);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      box-shadow: 0 2px 12px rgba(124, 58, 237, 0.4);
     }
     .pricing-card h1 {
       font-size: 1.75rem;
@@ -54,10 +118,14 @@
       margin-bottom: 8px;
     }
     .pricing-card .price {
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: #7C3AED;
+      font-size: 3.5rem;
+      font-weight: 800;
       margin: 24px 0 32px;
+      background: linear-gradient(135deg, #7C3AED 0%, #a78bfa 50%, #c4b5fd 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -1px;
     }
     .pricing-card ul {
       list-style: none;
@@ -65,7 +133,7 @@
       color: #b0b0b0;
       font-size: 0.95rem;
       line-height: 1.8;
-      margin-bottom: 32px;
+      margin-bottom: 16px;
       padding-left: 0;
       display: block;
       margin-left: 0;
@@ -83,19 +151,29 @@
       margin-right: 8px;
       flex-shrink: 0;
     }
+    .pricing-card .urgency {
+      font-size: 0.85rem;
+      color: #666;
+      font-style: italic;
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
     .btn-buy {
       display: inline-block;
       background: #7C3AED;
       color: #fff;
       text-decoration: none;
       font-weight: 600;
-      padding: 16px 32px;
+      padding: 20px 40px;
+      font-size: 1.05rem;
       border-radius: 50px;
-      transition: background 0.2s, transform 0.2s;
+      transition: background 0.2s, transform 0.2s, box-shadow 0.3s;
+      box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
     }
     .btn-buy:hover {
       background: #6d28d9;
       transform: translateY(-2px);
+      box-shadow: 0 8px 35px rgba(124, 58, 237, 0.5);
     }
     .pricing-card .billing-note {
       font-size: 0.8rem;
@@ -108,6 +186,8 @@
       text-align: center;
       font-size: 14px;
       color: #888;
+      position: relative;
+      z-index: 1;
     }
     footer a {
       color: #7C3AED;
@@ -116,6 +196,7 @@
     footer a:hover { text-decoration: underline; }
     @media (max-width: 768px) {
       .pricing-card { padding: 32px 24px; }
+      .pricing-card .price { font-size: 2.75rem; }
     }
   </style>
 </head>
@@ -128,6 +209,7 @@
   </nav>
   <main>
     <div class="pricing-card">
+      <span class="badge-popular">All-In-One</span>
       <h1>ToolGrimoire Access</h1>
       <p style="color:#777;">Your shortcut to the entire AI tools landscape</p>
       <div class="price">€7 / month</div>
@@ -137,6 +219,7 @@
         <li>Covers both mainstream and underground tools</li>
         <li>Find the right tool in seconds, not hours</li>
       </ul>
+      <p class="urgency">Join 400+ tools already being used by creators and developers</p>
       <a href="https://www.creem.io/payment/prod_IVglTPxXITzVKRK68rfl8" class="btn-buy" target="_blank" rel="noopener">Get Access</a>
       <p class="billing-note">Billed monthly. Cancel anytime.</p>
     </div>
