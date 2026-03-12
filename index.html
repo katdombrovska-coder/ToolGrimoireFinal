@@ -3469,24 +3469,27 @@ html {
         <noscript>You need to enable JavaScript to run this app.</noscript>
         <div id="root"></div>
 
-        <!-- ToolGrimoire Freemium: lock overlay & auth modal styles -->
+        <!-- ToolGrimoire Freemium: blurred section + banner + auth modal -->
         <style id="tg-freemium-styles">
-          .tg-lock-wrapper { position: relative; }
-          .tg-lock-wrapper .product-card { filter: blur(4px); pointer-events: none; user-select: none; }
-          .tg-lock-overlay {
-            position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: rgba(0,0,0,0.75); border-radius: 12px; gap: 12px; z-index: 2;
+          .tg-blurred-section { position: relative; }
+          .tg-blurred-section .tg-blur-overlay {
+            position: absolute; inset: 0; z-index: 1; pointer-events: none;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.9) 100%);
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
           }
-          .tg-lock-overlay .tg-lock-icon { color: #7C3AED; width: 32px; height: 32px; }
-          .tg-lock-overlay .tg-lock-text { color: rgba(255,255,255,0.9); font-size: 14px; font-family: 'Montserrat', sans-serif; }
-          .tg-lock-overlay .tg-btn-unlock, .tg-lock-overlay .tg-btn-get-access {
-            display: inline-block; padding: 10px 20px; border-radius: 50px; font-weight: 600; font-size: 14px;
-            font-family: 'Montserrat', sans-serif; cursor: pointer; text-decoration: none; transition: background 0.2s, transform 0.2s;
+          .tg-unlock-banner {
+            background: #0a0a0a; border-top: 1px solid rgba(255,255,255,0.06);
+            text-align: center; padding: 28px 24px; font-family: 'Montserrat', sans-serif;
           }
-          .tg-lock-overlay .tg-btn-unlock { background: #7C3AED; color: #fff; border: none; }
-          .tg-lock-overlay .tg-btn-unlock:hover { background: #6d28d9; transform: translateY(-2px); }
-          .tg-lock-overlay .tg-btn-get-access { background: #7C3AED; color: #fff; }
-          .tg-lock-overlay .tg-btn-get-access:hover { background: #6d28d9; transform: translateY(-2px); }
+          .tg-unlock-banner .tg-banner-text {
+            color: #4a4a4a; font-size: 15px; margin-bottom: 16px; font-weight: 400;
+          }
+          .tg-unlock-banner .tg-btn-access {
+            display: inline-block; padding: 12px 24px; border-radius: 50px; background: #7C3AED; color: #fff;
+            font-weight: 600; font-size: 14px; text-decoration: none; font-family: 'Montserrat', sans-serif;
+            transition: background 0.2s, transform 0.2s;
+          }
+          .tg-unlock-banner .tg-btn-access:hover { background: #6d28d9; transform: translateY(-2px); }
           #tg-auth-modal {
             display: none; position: fixed; inset: 0; z-index: 9999; align-items: center; justify-content: center;
             background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); font-family: 'Montserrat', sans-serif;
@@ -3520,19 +3523,6 @@ html {
           .tg-nav-auth.tg-signin:hover { background: #7C3AED; color: #fff; }
           .tg-nav-auth.tg-signout { background: transparent; color: #888; border: 1px solid rgba(255,255,255,0.1); }
           .tg-nav-auth.tg-signout:hover { background: rgba(255,255,255,0.08); color: #fff; }
-          .tg-unlock-cta {
-            text-align: center; padding: 32px 24px; margin: 24px 0;
-            background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.2); border-radius: 16px;
-            font-family: 'Montserrat', sans-serif;
-          }
-          .tg-unlock-cta .tg-unlock-title { color: #fff; font-size: 1.25rem; font-weight: 700; margin-bottom: 8px; }
-          .tg-unlock-cta .tg-unlock-sub { color: rgba(255,255,255,0.7); font-size: 14px; margin-bottom: 16px; }
-          .tg-unlock-cta .tg-btn-unlock-cta {
-            display: inline-block; padding: 12px 24px; border-radius: 50px; background: #7C3AED; color: #fff;
-            font-weight: 600; font-size: 14px; text-decoration: none; border: none; cursor: pointer;
-            font-family: 'Montserrat', sans-serif; transition: background 0.2s, transform 0.2s;
-          }
-          .tg-unlock-cta .tg-btn-unlock-cta:hover { background: #6d28d9; transform: translateY(-2px); }
         </style>
 
         <!-- Auth modal -->
@@ -3698,53 +3688,33 @@ html {
               return !!toolName && FREE_TOOLS.has(toolName);
             }
 
-            function shouldUnlockCard(toolName) {
-              if (isFreeTool(toolName)) return true;
-              return hasFullAccess();
-            }
-
-            function ensureCardUnwrapped(card) {
-              const wrapper = card.closest('.tg-lock-wrapper');
-              if (wrapper) {
-                wrapper.parentNode.insertBefore(card, wrapper);
-                wrapper.remove();
-              }
-            }
-
-            function buildLockOverlay(card) {
-              const overlay = document.createElement('div');
-              overlay.className = 'tg-lock-overlay';
-              overlay.innerHTML = '<svg class="tg-lock-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>' +
-                '<span class="tg-lock-text">Unlock full access to browse all tools</span>' +
-                (currentUser ? '<a href="' + CREEM_PAYMENT_URL + '" class="tg-btn-get-access" target="_blank" rel="noopener">Get Access</a>' : '<button type="button" class="tg-btn-unlock">Unlock Full Access</button>');
-              const btn = overlay.querySelector('.tg-btn-unlock');
-              if (btn) btn.addEventListener('click', function(e) { e.preventDefault(); openAuthModal(); });
-              return overlay;
-            }
-
-            function applyLockOverlays() {
+            function setupFreemiumLayout() {
               if (document.getElementById('tg-freemium-container')) {
-                Array.from(document.querySelectorAll('#tg-locked-grid .tg-lock-wrapper')).forEach(function(wrap) {
-                  const card = wrap.querySelector('.product-card');
-                  const name = card ? getToolName(card) : '';
-                  if (shouldUnlockCard(name)) {
-                    wrap.parentNode.insertBefore(card, wrap);
-                    wrap.remove();
-                  } else {
-                    let overlay = wrap.querySelector('.tg-lock-overlay');
-                    if (!overlay) wrap.appendChild(buildLockOverlay(card));
-                    else {
-                      overlay.innerHTML = '<svg class="tg-lock-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg><span class="tg-lock-text">Unlock full access to browse all tools</span>' + (currentUser ? '<a href="' + CREEM_PAYMENT_URL + '" class="tg-btn-get-access" target="_blank" rel="noopener">Get Access</a>' : '<button type="button" class="tg-btn-unlock">Unlock Full Access</button>');
-                      const b = overlay.querySelector('.tg-btn-unlock');
-                      if (b) b.addEventListener('click', function(e) { e.preventDefault(); openAuthModal(); });
-                    }
+                const blurredSection = document.getElementById('tg-blurred-section');
+                const banner = document.getElementById('tg-unlock-banner');
+                if (hasFullAccess()) {
+                  if (blurredSection) blurredSection.classList.remove('tg-blurred-section');
+                  const overlay = document.getElementById('tg-blur-overlay');
+                  if (overlay) overlay.remove();
+                  if (banner) banner.style.display = 'none';
+                } else {
+                  if (blurredSection) blurredSection.classList.add('tg-blurred-section');
+                  if (!document.getElementById('tg-blur-overlay') && document.getElementById('tg-locked-grid')) {
+                    const ov = document.createElement('div');
+                    ov.id = 'tg-blur-overlay';
+                    ov.className = 'tg-blur-overlay';
+                    document.getElementById('tg-blurred-section').insertBefore(ov, document.getElementById('tg-locked-grid'));
                   }
-                });
+                  if (banner) banner.style.display = 'block';
+                }
                 return;
               }
               const allCards = Array.from(document.querySelectorAll('.product-card'));
               if (!allCards.length) return;
-              allCards.forEach(ensureCardUnwrapped);
+              allCards.forEach(function(card) {
+                const w = card.closest('.tg-lock-wrapper');
+                if (w) { w.parentNode.insertBefore(card, w); w.remove(); }
+              });
               const freeCards = [];
               const lockedCards = [];
               allCards.forEach(function(card) {
@@ -3764,25 +3734,27 @@ html {
               const freeGrid = document.createElement('div');
               freeGrid.className = 'ai-grid';
               freeGrid.id = 'tg-free-grid';
-              freeCards.forEach(function(card) { freeGrid.appendChild(card); });
-              const cta = document.createElement('div');
-              cta.className = 'tg-unlock-cta';
-              cta.innerHTML = '<p class="tg-unlock-title">Unlock 400+ more tools</p><p class="tg-unlock-sub">See the full database — sign in or get access to browse everything.</p><button type="button" class="tg-btn-unlock-cta">Unlock Full Access</button>';
-              cta.querySelector('.tg-btn-unlock-cta').addEventListener('click', function(e) { e.preventDefault(); openAuthModal(); });
+              freeCards.forEach(function(c) { freeGrid.appendChild(c); });
+              const blurredSection = document.createElement('div');
+              blurredSection.id = 'tg-blurred-section';
+              if (!hasFullAccess()) blurredSection.className = 'tg-blurred-section';
+              const blurOverlay = document.createElement('div');
+              blurOverlay.id = 'tg-blur-overlay';
+              blurOverlay.className = 'tg-blur-overlay';
               const lockedGrid = document.createElement('div');
               lockedGrid.className = 'ai-grid';
               lockedGrid.id = 'tg-locked-grid';
-              lockedCards.forEach(function(card) {
-                const wrap = document.createElement('div');
-                wrap.className = 'tg-lock-wrapper';
-                card.parentNode.insertBefore(wrap, card);
-                wrap.appendChild(card);
-                if (!hasFullAccess()) wrap.appendChild(buildLockOverlay(card));
-                lockedGrid.appendChild(wrap);
-              });
+              lockedCards.forEach(function(c) { lockedGrid.appendChild(c); });
+              if (!hasFullAccess()) blurredSection.appendChild(blurOverlay);
+              blurredSection.appendChild(lockedGrid);
+              const banner = document.createElement('div');
+              banner.id = 'tg-unlock-banner';
+              banner.className = 'tg-unlock-banner';
+              banner.innerHTML = '<p class="tg-banner-text">Unlock 400+ tools — sign in or get access to browse everything</p><a href="/pricing.html" class="tg-btn-access">Access All Tools</a>';
+              if (hasFullAccess()) banner.style.display = 'none';
               container.appendChild(freeGrid);
-              container.appendChild(cta);
-              container.appendChild(lockedGrid);
+              container.appendChild(blurredSection);
+              container.appendChild(banner);
               toolsSection.insertBefore(container, toolsSection.firstChild);
               allGrids.forEach(function(el) {
                 if (el.id !== 'tg-free-grid' && el.id !== 'tg-locked-grid') el.remove();
@@ -3790,7 +3762,7 @@ html {
             }
 
             function updateUI() {
-              applyLockOverlays();
+              setupFreemiumLayout();
               const nav = document.querySelector('.nav-header');
               let authBtn = document.getElementById('tg-nav-auth-btn');
               if (!nav) return;
@@ -3827,14 +3799,14 @@ html {
 
             function runAfterMount() {
               initSupabase().catch(console.error);
-              function tryApply() {
-                if (document.querySelector('.product-card') && !document.getElementById('tg-freemium-container')) applyLockOverlays();
+              function trySetup() {
+                if (document.querySelector('.product-card') && !document.getElementById('tg-freemium-container')) setupFreemiumLayout();
                 if (!document.getElementById('tg-nav-auth-btn') && document.querySelector('.nav-header')) updateUI();
               }
-              const observer = new MutationObserver(function() { tryApply(); });
+              const observer = new MutationObserver(function() { trySetup(); });
               observer.observe(document.getElementById('root'), { childList: true, subtree: true });
-              setTimeout(tryApply, 1200);
-              setTimeout(tryApply, 2500);
+              setTimeout(trySetup, 1200);
+              setTimeout(trySetup, 2500);
             }
 
             document.getElementById('tg-auth-close').addEventListener('click', closeAuthModal);
