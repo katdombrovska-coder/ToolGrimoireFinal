@@ -3544,18 +3544,16 @@ html {
           @keyframes tg-badge-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
           .tg-featured-section .product-card { position: relative; }
           .tg-unlock-banner {
-            background: #0a0a0a; border: 1px solid rgba(255,255,255,0.06); border-radius: 12px;
-            text-align: center; padding: 28px 24px; margin-top: 2rem; font-family: 'Montserrat', sans-serif;
-          }
-          .tg-unlock-banner .tg-banner-text {
-            color: rgba(255,255,255,0.7); font-size: 15px; margin-bottom: 16px; font-weight: 400;
+            text-align: center; padding: 2rem 0; margin-top: 0;
           }
           .tg-unlock-banner .tg-btn-access {
-            display: inline-block; padding: 12px 24px; border-radius: 50px; background: #7C3AED; color: #fff;
-            font-weight: 600; font-size: 14px; text-decoration: none; font-family: 'Montserrat', sans-serif;
-            transition: background 0.2s, transform 0.2s;
+            display: inline-block; padding: 18px 36px; border-radius: 50px; background: #7C3AED; color: #fff;
+            font-weight: 700; font-size: 18px; text-decoration: none; font-family: 'Montserrat', sans-serif;
+            transition: background 0.2s, transform 0.15s, box-shadow 0.15s;
+            box-shadow: 0 4px 20px rgba(124, 58, 237, 0.4);
           }
-          .tg-unlock-banner .tg-btn-access:hover { background: #6d28d9; transform: translateY(-2px); }
+          .tg-unlock-banner .tg-btn-access:hover { background: #6d28d9; transform: translateY(-3px); box-shadow: 0 8px 28px rgba(124, 58, 237, 0.5); }
+          .tg-unlock-banner .tg-btn-access:active { transform: scale(0.97); box-shadow: 0 2px 12px rgba(124, 58, 237, 0.5); }
         </style>
 
         <!-- Auth modal -->
@@ -3822,7 +3820,7 @@ html {
               const bannerEl = document.createElement('div');
               bannerEl.id = 'tg-unlock-banner';
               bannerEl.className = 'tg-unlock-banner';
-              bannerEl.innerHTML = '<p class="tg-banner-text">Unlock 400+ tools — sign in or get access to browse everything</p><a href="/pricing.html" class="tg-btn-access">Access All Tools</a>';
+              bannerEl.innerHTML = '<a href="/pricing.html" class="tg-btn-access">Access All Tools</a>';
               if (hasFullAccess()) bannerEl.style.display = 'none';
               toolsContainer.appendChild(bannerEl);
             }
