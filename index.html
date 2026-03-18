@@ -11,6 +11,7 @@ body:not([unresolved]) { opacity: 1 !important; }
         <meta property="og:title" content="ToolGrimoire">
         <meta property="og:site_name" content="ToolGrimoire">
         <meta name="twitter:title" content="ToolGrimoire">
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
         <link rel="preconnect" href="https://fonts.googleapis.com/">
         <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
         <link rel="preload" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" as="style">
@@ -3567,7 +3568,7 @@ html {
           }
           .tg-trending-badge svg { width: 12px; height: 12px; flex-shrink: 0; }
           @keyframes tg-badge-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-          .tg-featured-section .product-card { position: relative; }
+          .tg-featured-section .product-card { position: relative; border: 1px solid rgba(124, 58, 237, 0.3) !important; box-shadow: 0 0 18px rgba(124, 58, 237, 0.08), 0 1px 3px rgba(0,0,0,0.1) !important; }
           .tg-unlock-banner {
             text-align: center; padding: 2rem 0; margin-top: 0;
           }
@@ -3579,6 +3580,8 @@ html {
           }
           .tg-unlock-banner .tg-btn-access:hover { background: #6d28d9; transform: translateY(-3px); box-shadow: 0 8px 28px rgba(124, 58, 237, 0.5); }
           .tg-unlock-banner .tg-btn-access:active { transform: scale(0.97); box-shadow: 0 2px 12px rgba(124, 58, 237, 0.5); }
+          .tg-badge-full-access { display: inline-block; padding: 6px 14px; border-radius: 50px; font-size: 13px; font-weight: 600; background: #7C3AED; color: #fff; font-family: 'Montserrat', sans-serif; margin-right: 8px; }
+          .tg-welcome-msg { font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: rgba(255,255,255,0.9); margin-bottom: 1.25rem; padding: 0; font-weight: 500; }
         </style>
 
         <!-- Auth modal -->
@@ -3710,10 +3713,21 @@ html {
             let supabase;
             let currentUser = null;
             let isPaidUser = false;
+            let supabaseReady = false;
+
+            initSupabase().then(function() { supabaseReady = true; }).catch(function(e) { console.error('Supabase init failed:', e); });
 
             async function initSupabase() {
-              const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
-              supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+              try {
+                var createClient;
+                try {
+                  var m = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+                  createClient = m.createClient;
+                } catch (e1) {
+                  var m2 = await import('https://esm.sh/@supabase/supabase-js@2');
+                  createClient = m2.createClient;
+                }
+                supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
               supabase.auth.onAuthStateChange(async (event, session) => {
                 currentUser = session?.user ?? null;
                 isPaidUser = false;
@@ -3730,6 +3744,10 @@ html {
                 isPaidUser = !!data;
               }
               updateUI();
+              } catch (e) {
+                console.error('Supabase init error:', e);
+                throw e;
+              }
             }
 
             function hasFullAccess() {
@@ -3764,10 +3782,37 @@ html {
               card.insertBefore(badge, card.firstChild);
             }
 
+            function updateToolsMessages() {
+              var container = document.getElementById('tg-featured-section');
+              container = container ? container.parentNode : null;
+              if (!container) {
+                var ag = document.querySelector('.ai-grid');
+                container = ag ? ag.parentNode : document.getElementById('tools');
+              }
+              if (!container) return;
+              var welcomeEl = document.getElementById('tg-welcome-msg');
+              if (!currentUser || !currentUser.email || !hasFullAccess()) {
+                if (welcomeEl) welcomeEl.remove();
+                return;
+              }
+              var name = (currentUser.user_metadata && currentUser.user_metadata.full_name) || currentUser.email.split('@')[0] || currentUser.email;
+              if (!welcomeEl) {
+                welcomeEl = document.createElement('p');
+                welcomeEl.id = 'tg-welcome-msg';
+                welcomeEl.className = 'tg-welcome-msg';
+                var firstChild = container.querySelector('#tg-featured-section') || container.querySelector('.tg-unlock-banner') || container.querySelector('.ai-grid');
+                container.insertBefore(welcomeEl, firstChild);
+              }
+              welcomeEl.textContent = 'Your toolkit is ready, ' + name + '.';
+              welcomeEl.style.display = '';
+            }
+
             function setupFreemiumLayout() {
               const featuredSection = document.getElementById('tg-featured-section');
               const banner = document.getElementById('tg-unlock-banner');
               if (banner) banner.style.display = hasFullAccess() ? 'none' : 'block';
+
+              updateToolsMessages();
 
               if (featuredSection) {
                 document.querySelectorAll('.product-card').forEach(function(card) {
@@ -3853,21 +3898,44 @@ html {
             function updateUI() {
               setupFreemiumLayout();
               const nav = document.querySelector('.nav-header');
-              let authBtn = document.getElementById('tg-nav-auth-btn');
+              var authWrap = document.getElementById('tg-nav-auth-wrap');
               if (!nav) return;
-              if (authBtn) authBtn.remove();
-              authBtn = document.createElement(currentUser ? 'button' : 'a');
-              authBtn.id = 'tg-nav-auth-btn';
-              authBtn.className = 'tg-nav-auth ' + (currentUser ? 'tg-signout' : 'tg-signin');
-              authBtn.textContent = currentUser ? 'Sign Out' : 'Sign In';
+              if (authWrap) authWrap.remove();
+              authWrap = document.createElement('div');
+              authWrap.id = 'tg-nav-auth-wrap';
+              authWrap.style.cssText = 'margin-left:auto;display:flex;align-items:center;gap:10px;';
               if (currentUser) {
-                authBtn.type = 'button';
-                authBtn.addEventListener('click', async function() { await supabase.auth.signOut(); });
+                if (isPaidUser) {
+                  var badge = document.createElement('span');
+                  badge.className = 'tg-badge-full-access';
+                  badge.textContent = 'Full Access';
+                  authWrap.appendChild(badge);
+                }
+                var signOutBtn = document.createElement('button');
+                signOutBtn.type = 'button';
+                signOutBtn.className = 'tg-nav-auth tg-signout';
+                signOutBtn.textContent = 'Sign Out';
+                signOutBtn.style.background = 'transparent';
+                signOutBtn.style.border = '1px solid rgba(255,255,255,0.1)';
+                signOutBtn.style.color = '#888';
+                signOutBtn.style.cursor = 'pointer';
+                signOutBtn.addEventListener('click', function() {
+                  currentUser = null;
+                  isPaidUser = false;
+                  if (supabase) supabase.auth.signOut().catch(function() {});
+                  try { localStorage.removeItem('sb-vplpcitffpwsjdczsvnz-auth-token'); } catch (_) {}
+                  updateUI();
+                });
+                authWrap.appendChild(signOutBtn);
               } else {
-                authBtn.href = '#';
-                authBtn.addEventListener('click', function(e) { e.preventDefault(); openAuthModal(); });
+                var signInLink = document.createElement('a');
+                signInLink.href = '#';
+                signInLink.className = 'tg-nav-auth tg-signin';
+                signInLink.textContent = 'Sign In';
+                signInLink.addEventListener('click', function(e) { e.preventDefault(); openAuthModal(); });
+                authWrap.appendChild(signInLink);
               }
-              nav.appendChild(authBtn);
+              nav.appendChild(authWrap);
             }
 
             function openAuthModal() {
@@ -3881,16 +3949,17 @@ html {
             }
 
             function setAuthMsg(text, isError) {
-              const el = document.getElementById('tg-auth-msg');
-              el.textContent = text;
-              el.className = 'tg-msg ' + (isError ? 'tg-error' : 'tg-success');
+              var el = document.getElementById('tg-auth-msg');
+              if (!el) return;
+              el.textContent = text || '';
+              el.className = 'tg-msg ' + (text ? (isError ? 'tg-error' : 'tg-success') : '');
+              el.style.display = text ? 'block' : 'none';
             }
 
             function runAfterMount() {
-              initSupabase().catch(console.error);
               function trySetup() {
                 if (document.querySelector('.product-card') && !document.getElementById('tg-featured-section')) setupFreemiumLayout();
-                if (!document.getElementById('tg-nav-auth-btn') && document.querySelector('.nav-header')) updateUI();
+                if (!document.getElementById('tg-nav-auth-wrap') && document.querySelector('.nav-header')) updateUI();
               }
               const observer = new MutationObserver(function() { trySetup(); });
               observer.observe(document.getElementById('root'), { childList: true, subtree: true });
@@ -3905,35 +3974,72 @@ html {
                 document.querySelectorAll('[data-tg-tab]').forEach(function(t) { t.classList.remove('tg-active'); });
                 this.classList.add('tg-active');
                 const isSignUp = this.getAttribute('data-tg-tab') === 'signup';
-                document.getElementById('tg-auth-submit').textContent = isSignUp ? 'Sign Up' : 'Sign In';
-                document.getElementById('tg-auth-form').dataset.mode = isSignUp ? 'signup' : 'signin';
+                var sub = document.getElementById('tg-auth-submit');
+                if (sub) sub.textContent = isSignUp ? 'Sign Up' : 'Sign In';
+                var f = document.getElementById('tg-auth-form');
+                if (f) f.dataset.mode = isSignUp ? 'signup' : 'signin';
               });
             });
-            document.getElementById('tg-auth-form').dataset.mode = 'signin';
-            document.getElementById('tg-auth-form').addEventListener('submit', async function(e) {
+            var authFormEl = document.getElementById('tg-auth-form');
+            if (authFormEl) authFormEl.dataset.mode = 'signin';
+
+            document.addEventListener('submit', async function(e) {
+              var form = e.target;
+              if (!form || form.id !== 'tg-auth-form') return;
               e.preventDefault();
-              const email = document.getElementById('tg-auth-email').value.trim();
-              const password = document.getElementById('tg-auth-password').value;
-              const isSignUp = document.getElementById('tg-auth-form').dataset.mode === 'signup';
-              const submitBtn = document.getElementById('tg-auth-submit');
-              submitBtn.disabled = true;
-              setAuthMsg('', false);
+              e.stopPropagation();
+              if (!supabase) {
+                setAuthMsg('Initializing... please wait.', false);
+                for (var w = 0; w < 40; w++) {
+                  await new Promise(function(r) { setTimeout(r, 200); });
+                  if (supabase) break;
+                }
+              }
+              if (!supabase) {
+                setAuthMsg('Could not connect. Please refresh the page and try again.', true);
+                return;
+              }
+              var email = (document.getElementById('tg-auth-email') || {}).value || '';
+              var password = (document.getElementById('tg-auth-password') || {}).value || '';
+              var isSignUp = (form.dataset || {}).mode === 'signup';
+              var submitBtn = document.getElementById('tg-auth-submit');
+              if (submitBtn) submitBtn.disabled = true;
+              setAuthMsg('Sending...', false);
               try {
-                if (isSignUp) {
-                  const { error } = await supabase.auth.signUp({ email, password });
-                  if (error) throw error;
+                if (isSignUp && supabase) {
+                  var res = await supabase.auth.signUp({ email: email.trim(), password: password });
+                  if (res.error) throw res.error;
                   setAuthMsg('Check your email to confirm your account.', false);
-                } else {
-                  const { error } = await supabase.auth.signInWithPassword({ email, password });
-                  if (error) throw error;
-                  setAuthMsg('Signed in successfully.', false);
-                  setTimeout(closeAuthModal, 800);
+                } else if (!isSignUp) {
+                  var r = await fetch(SUPABASE_URL + '/auth/v1/token?grant_type=password', {
+                    method: 'POST',
+                    headers: { 'apikey': SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email.trim(), password: password })
+                  });
+                  var data = await r.json();
+                  if (data.error || data.msg) throw new Error(data.msg || data.error_description || (data.error && data.error.description) || 'Sign in failed');
+                  currentUser = data.user || null;
+                  if (currentUser && data.access_token) {
+                    if (supabase) supabase.auth.setSession({ access_token: data.access_token, refresh_token: data.refresh_token || '' }).catch(function() {});
+                    isPaidUser = false;
+                    try {
+                      var pu = await fetch(SUPABASE_URL + '/rest/v1/paid_users?email=eq.' + encodeURIComponent(currentUser.email) + '&select=email', {
+                        headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + data.access_token }
+                      });
+                      var pud = await pu.json();
+                      isPaidUser = pud && pud.length > 0;
+                    } catch (_) {}
+                    updateUI();
+                    setAuthMsg('Signed in successfully.', false);
+                    setTimeout(function() { closeAuthModal(); }, 800);
+                  }
                 }
               } catch (err) {
-                setAuthMsg(err.message || 'Something went wrong.', true);
+                console.error('Auth error:', err);
+                setAuthMsg((err && err.message) ? err.message : 'Something went wrong.', true);
               }
-              submitBtn.disabled = false;
-            });
+              if (submitBtn) submitBtn.disabled = false;
+            }, true);
 
             if (document.readyState === 'loading') {
               document.addEventListener('DOMContentLoaded', runAfterMount);

@@ -1,0 +1,16 @@
+/* Additional app-specific styles */
+.App {
+  min-height: 100vh;
+  background: var(--bg-page, #0a0a0f);
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Selection styling */
+::selection {
+  background: var(--accent-wash, rgba(139, 92, 246, 0.3));
+  color: var(--accent-text, #e9d5ff);
+}
