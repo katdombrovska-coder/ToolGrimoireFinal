@@ -1,4 +1,0 @@
-/* Base styles - index.html provides full Tailwind/CSS; this file ensures React root has minimal base */
-#root {
-  min-height: 100vh;
-}
