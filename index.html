@@ -3704,8 +3704,8 @@ html {
             const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwbHBjaXRmZnB3c2pkY3pzdm56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyOTY3OTgsImV4cCI6MjA4ODg3Mjc5OH0.zDMczh4NMUzakcSkqr4ZT72RSqdmv3IzScf30iVZKbY';
             const CREEM_PAYMENT_URL = 'https://www.creem.io/payment/prod_IVglTPxXITzVKRK68rfl8';
             // Featured 15 tools: exact names as in app data + alternates. Display order for featured section.
-            const FEATURED_ORDER = ['Replit', 'Emergent AI', 'Midjourney', 'Cursor', 'Apify', 'Perplexity', 'ElevenLabs', 'Higgsfield', 'n8n', 'Instantly AI', 'Lovable', 'Bolt', 'V0'];
-            const FREE_TOOLS = new Set(['Replit', 'Emergent AI', 'Emergent', 'Midjourney', 'Cursor', 'Apify', 'Perplexity', 'ElevenLabs', 'Higgsfield', 'n8n', 'Instantly AI', 'Instantly.ai', 'Lovable', 'Bolt', 'Bolt.new', 'V0', 'v0 (Vercel)']);
+            const FEATURED_ORDER = ['Replit', 'Emergent AI', 'Midjourney', 'Cursor', 'Apify', 'Perplexity', 'ElevenLabs', 'Higgsfield', 'n8n', 'Instantly AI', 'Lovable', 'Primio', 'V0'];
+            const FREE_TOOLS = new Set(['Replit', 'Emergent AI', 'Emergent', 'Midjourney', 'Cursor', 'Apify', 'Perplexity', 'ElevenLabs', 'Higgsfield', 'n8n', 'Instantly AI', 'Instantly.ai', 'Lovable', 'V0', 'v0 (Vercel)']);
 
             let supabase;
             let currentUser = null;
@@ -3765,6 +3765,23 @@ html {
               card.insertBefore(badge, card.firstChild);
             }
 
+            function isBoltToolName(name) {
+              return name === 'Bolt' || name === 'Bolt.new';
+            }
+
+            function buildPrimioCardFrom(card, markerAttr) {
+              const clone = card.cloneNode(true);
+              if (markerAttr) clone.setAttribute(markerAttr, '1');
+              clone.setAttribute('href', 'https://primio.dev/');
+              const title = clone.querySelector('.product-card-title');
+              if (title) title.textContent = 'Primio';
+              const description = clone.querySelector('.product-card-description');
+              if (description) description.textContent = 'Build premium mobile apps with AI, from idea to production-ready app.';
+              const pricing = clone.querySelector('.text-sm.font-medium.text-secondary');
+              if (pricing) pricing.textContent = 'Freemium';
+              return clone;
+            }
+
             function setupFreemiumLayout() {
               const featuredSection = document.getElementById('tg-featured-section');
               const banner = document.getElementById('tg-unlock-banner');
@@ -3788,12 +3805,21 @@ html {
                 return;
               }
 
-              const allCards = Array.from(document.querySelectorAll('.product-card'));
+              let allCards = Array.from(document.querySelectorAll('.product-card'));
               if (!allCards.length) return;
               allCards.forEach(function(card) {
                 const w = card.closest('.tg-lock-wrapper');
                 if (w) { w.parentNode.insertBefore(card, w); w.remove(); }
               });
+
+              allCards = Array.from(document.querySelectorAll('.product-card'));
+              const boltCardForCategory = allCards.find(function(card) { return isBoltToolName(getToolName(card)); });
+              if (boltCardForCategory && boltCardForCategory.parentNode && !boltCardForCategory.parentNode.querySelector('[data-tg-primio-category="1"]')) {
+                const primioCategoryCard = buildPrimioCardFrom(boltCardForCategory, 'data-tg-primio-category');
+                boltCardForCategory.parentNode.insertBefore(primioCategoryCard, boltCardForCategory.nextSibling);
+              }
+
+              allCards = Array.from(document.querySelectorAll('.product-card'));
 
               const featuredCards = [];
               const restCards = [];
@@ -3807,10 +3833,16 @@ html {
               const orderIndex = function(name) {
                 const n = (name || '').trim();
                 for (let i = 0; i < FEATURED_ORDER.length; i++) {
-                  if (n === FEATURED_ORDER[i] || (n === 'Emergent' && FEATURED_ORDER[i] === 'Emergent AI') || (n === 'Instantly.ai' && FEATURED_ORDER[i] === 'Instantly AI') || (n === 'Bolt.new' && FEATURED_ORDER[i] === 'Bolt') || (n === 'v0 (Vercel)' && FEATURED_ORDER[i] === 'V0')) return i;
+                  if (n === FEATURED_ORDER[i] || (n === 'Emergent' && FEATURED_ORDER[i] === 'Emergent AI') || (n === 'Instantly.ai' && FEATURED_ORDER[i] === 'Instantly AI') || (n === 'v0 (Vercel)' && FEATURED_ORDER[i] === 'V0')) return i;
                 }
                 return 999;
               };
+
+              const boltCardForFeatured = allCards.find(function(card) { return isBoltToolName(getToolName(card)); });
+              if (boltCardForFeatured) {
+                const primioFeaturedCard = buildPrimioCardFrom(boltCardForFeatured, 'data-tg-primio-featured');
+                featuredCards.push(primioFeaturedCard);
+              }
               featuredCards.sort(function(a, b) { return orderIndex(getToolName(a)) - orderIndex(getToolName(b)); });
 
               const allGrids = document.querySelectorAll('.ai-grid');
@@ -3828,8 +3860,9 @@ html {
               const grid = document.createElement('div');
               grid.className = 'tg-featured-grid';
               featuredCards.forEach(function(card) {
-                addTrendingBadge(card);
-                grid.appendChild(card);
+                const featuredCard = card.cloneNode(true);
+                addTrendingBadge(featuredCard);
+                grid.appendChild(featuredCard);
               });
               section.appendChild(title);
               section.appendChild(grid);
