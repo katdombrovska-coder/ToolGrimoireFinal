@@ -3733,7 +3733,8 @@ html {
             }
 
             function hasFullAccess() {
-              return currentUser && isPaidUser;
+              // Temporary mode: keep all tools open regardless of auth/payment.
+              return true;
             }
 
             function getToolName(card) {
@@ -3834,13 +3835,15 @@ html {
               section.appendChild(grid);
               toolsContainer.insertBefore(section, toolsContainer.firstChild);
 
-              restCards.forEach(function(card) {
-                const wrap = document.createElement('div');
-                wrap.className = 'tg-lock-wrapper';
-                card.parentNode.insertBefore(wrap, card);
-                wrap.appendChild(card);
-                if (!hasFullAccess()) wrap.appendChild(buildLockOverlay(card));
-              });
+              if (!hasFullAccess()) {
+                restCards.forEach(function(card) {
+                  const wrap = document.createElement('div');
+                  wrap.className = 'tg-lock-wrapper';
+                  card.parentNode.insertBefore(wrap, card);
+                  wrap.appendChild(card);
+                  wrap.appendChild(buildLockOverlay(card));
+                });
+              }
 
               const bannerEl = document.createElement('div');
               bannerEl.id = 'tg-unlock-banner';
