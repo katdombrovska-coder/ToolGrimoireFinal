@@ -3915,6 +3915,7 @@ html {
             const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwbHBjaXRmZnB3c2pkY3pzdm56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyOTY3OTgsImV4cCI6MjA4ODg3Mjc5OH0.zDMczh4NMUzakcSkqr4ZT72RSqdmv3IzScf30iVZKbY';
             const CREEM_PAYMENT_URL = 'https://www.creem.io/payment/prod_IVglTPxXITzVKRK68rfl8';
             const SUPABASE_AUTH_LOCK_KEY = 'lock:sb-vplpcitffpwsjdczsvnz-auth-token';
+            const TG_KNOWN_USER_KEY = 'tg-known-user';
             // Featured 15 tools: exact names as in app data + alternates. Display order for featured section.
             const FEATURED_ORDER = ['Replit', 'Emergent AI', 'Midjourney', 'Cursor', 'Apify', 'Perplexity', 'ElevenLabs', 'Higgsfield', 'n8n', 'Instantly AI', 'Lovable', 'Primio', 'V0'];
             const FREE_TOOLS = new Set(['Replit', 'Emergent AI', 'Emergent', 'Midjourney', 'Cursor', 'Apify', 'Perplexity', 'ElevenLabs', 'Higgsfield', 'n8n', 'Instantly AI', 'Instantly.ai', 'Lovable', 'V0', 'v0 (Vercel)']);
@@ -3923,6 +3924,7 @@ html {
             let currentUser = null;
             let isPaidUser = false;
             let forceAuthFlow = false;
+            let hasKnownUser = false;
 
             // In local/dev, multiple concurrent auth clients can race on the same
             // storage lock. This prevents noisy uncaught overlay for this known case.
@@ -3933,6 +3935,11 @@ html {
               }
             });
 
+            function markKnownUser() {
+              hasKnownUser = true;
+              try { localStorage.setItem(TG_KNOWN_USER_KEY, '1'); } catch (_) {}
+            }
+
             async function initSupabase() {
               const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
               supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -3940,14 +3947,17 @@ html {
                 currentUser = session?.user ?? null;
                 isPaidUser = false;
                 if (currentUser?.email) {
+                  markKnownUser();
                   const { data } = await supabase.from('paid_users').select('email').eq('email', currentUser.email).maybeSingle();
                   isPaidUser = !!data;
                 }
                 updateUI();
               });
+              try { hasKnownUser = localStorage.getItem(TG_KNOWN_USER_KEY) === '1'; } catch (_) {}
               const { data: { session } } = await supabase.auth.getSession();
               currentUser = session?.user ?? null;
               if (currentUser?.email) {
+                markKnownUser();
                 const { data } = await supabase.from('paid_users').select('email').eq('email', currentUser.email).maybeSingle();
                 isPaidUser = !!data;
               }
@@ -4168,7 +4178,7 @@ html {
             function updatePreloginGate() {
               const gate = document.getElementById('tg-prelogin-gate');
               if (!gate) return;
-              const showGate = !currentUser && !forceAuthFlow;
+              const showGate = !currentUser && !forceAuthFlow && !hasKnownUser;
               gate.style.display = showGate ? 'flex' : 'none';
               if (showGate) document.body.classList.add('tg-gate-active');
               else document.body.classList.remove('tg-gate-active');
@@ -4290,10 +4300,12 @@ html {
                 if (isSignUp) {
                   const { error } = await supabase.auth.signUp({ email, password });
                   if (error) throw error;
+                  markKnownUser();
                   setAuthMsg('Check your email to confirm your account.', false);
                 } else {
                   const { error } = await supabase.auth.signInWithPassword({ email, password });
                   if (error) throw error;
+                  markKnownUser();
                   setAuthMsg('Logged in successfully.', false);
                   setTimeout(closeAuthModal, 800);
                 }
