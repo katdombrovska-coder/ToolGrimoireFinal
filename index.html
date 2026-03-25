@@ -4189,6 +4189,34 @@ html {
               el.className = 'tg-msg ' + (isError ? 'tg-error' : 'tg-success');
             }
 
+            function switchAuthMode(mode) {
+              const isSignUp = mode === 'signup';
+              document.querySelectorAll('[data-tg-tab]').forEach(function(t) {
+                t.classList.toggle('tg-active', t.getAttribute('data-tg-tab') === mode);
+              });
+              document.getElementById('tg-auth-submit').textContent = isSignUp ? 'Sign Up' : 'Log In';
+              document.getElementById('tg-auth-form').dataset.mode = isSignUp ? 'signup' : 'signin';
+              const forgotBtn = document.getElementById('tg-auth-forgot');
+              if (forgotBtn) forgotBtn.style.display = isSignUp ? 'none' : 'block';
+            }
+
+            function normalizeAuthError(err, isSignUp) {
+              const raw = String((err && (err.message || err.error_description || err.code)) || err || '');
+              const msg = raw.toLowerCase();
+              if (msg.includes('email rate limit exceeded') || msg.includes('rate limit')) {
+                return isSignUp
+                  ? 'Too many email requests right now. Wait a few minutes, then try again, or use Log In if this email was already registered.'
+                  : 'Too many requests right now. Please wait a few minutes and try again.';
+              }
+              if (msg.includes('user already registered')) {
+                return 'This email is already registered. Use Log In instead.';
+              }
+              if (msg.includes('email not confirmed')) {
+                return 'Email not confirmed yet. Please open the confirmation email, then log in.';
+              }
+              return raw || 'Something went wrong.';
+            }
+
             function runAfterMount() {
               initSupabase().catch(console.error);
               if (new URLSearchParams(window.location.search).get('auth') === '1') {
@@ -4260,7 +4288,11 @@ html {
                   setTimeout(closeAuthModal, 800);
                 }
               } catch (err) {
-                setAuthMsg(err.message || 'Something went wrong.', true);
+                const friendly = normalizeAuthError(err, isSignUp);
+                setAuthMsg(friendly, true);
+                if (isSignUp && friendly.indexOf('already registered') !== -1) {
+                  switchAuthMode('signin');
+                }
               }
               submitBtn.disabled = false;
             });
