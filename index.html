@@ -3922,6 +3922,7 @@ html {
             let supabase;
             let currentUser = null;
             let isPaidUser = false;
+            let forceAuthFlow = false;
 
             // In local/dev, multiple concurrent auth clients can race on the same
             // storage lock. This prevents noisy uncaught overlay for this known case.
@@ -4167,7 +4168,7 @@ html {
             function updatePreloginGate() {
               const gate = document.getElementById('tg-prelogin-gate');
               if (!gate) return;
-              const showGate = !currentUser;
+              const showGate = !currentUser && !forceAuthFlow;
               gate.style.display = showGate ? 'flex' : 'none';
               if (showGate) document.body.classList.add('tg-gate-active');
               else document.body.classList.remove('tg-gate-active');
@@ -4181,6 +4182,10 @@ html {
 
             function closeAuthModal() {
               document.getElementById('tg-auth-modal').classList.remove('tg-open');
+              if (forceAuthFlow && !currentUser) {
+                forceAuthFlow = false;
+                updatePreloginGate();
+              }
             }
 
             function setAuthMsg(text, isError) {
@@ -4219,7 +4224,12 @@ html {
 
             function runAfterMount() {
               initSupabase().catch(console.error);
-              if (new URLSearchParams(window.location.search).get('auth') === '1') {
+              const params = new URLSearchParams(window.location.search);
+              const shouldOpenAuth = params.get('auth') === '1';
+              if (shouldOpenAuth) {
+                forceAuthFlow = true;
+                updatePreloginGate();
+                switchAuthMode('signin');
                 setTimeout(function() { openAuthModal(); }, 350);
               }
               function trySetup() {
