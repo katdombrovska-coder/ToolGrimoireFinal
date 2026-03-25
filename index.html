@@ -3914,6 +3914,7 @@ html {
             const SUPABASE_URL = 'https://vplpcitffpwsjdczsvnz.supabase.co';
             const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwbHBjaXRmZnB3c2pkY3pzdm56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyOTY3OTgsImV4cCI6MjA4ODg3Mjc5OH0.zDMczh4NMUzakcSkqr4ZT72RSqdmv3IzScf30iVZKbY';
             const CREEM_PAYMENT_URL = 'https://www.creem.io/payment/prod_IVglTPxXITzVKRK68rfl8';
+            const SUPABASE_AUTH_LOCK_KEY = 'lock:sb-vplpcitffpwsjdczsvnz-auth-token';
             // Featured 15 tools: exact names as in app data + alternates. Display order for featured section.
             const FEATURED_ORDER = ['Replit', 'Emergent AI', 'Midjourney', 'Cursor', 'Apify', 'Perplexity', 'ElevenLabs', 'Higgsfield', 'n8n', 'Instantly AI', 'Lovable', 'Primio', 'V0'];
             const FREE_TOOLS = new Set(['Replit', 'Emergent AI', 'Emergent', 'Midjourney', 'Cursor', 'Apify', 'Perplexity', 'ElevenLabs', 'Higgsfield', 'n8n', 'Instantly AI', 'Instantly.ai', 'Lovable', 'V0', 'v0 (Vercel)']);
@@ -3921,6 +3922,15 @@ html {
             let supabase;
             let currentUser = null;
             let isPaidUser = false;
+
+            // In local/dev, multiple concurrent auth clients can race on the same
+            // storage lock. This prevents noisy uncaught overlay for this known case.
+            window.addEventListener('unhandledrejection', function(e) {
+              var msg = String((e && e.reason && e.reason.message) || (e && e.reason) || '');
+              if (msg.indexOf(SUPABASE_AUTH_LOCK_KEY) !== -1) {
+                e.preventDefault();
+              }
+            });
 
             async function initSupabase() {
               const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
@@ -4132,7 +4142,21 @@ html {
               authBtn.textContent = currentUser ? 'Sign Out' : 'Log In';
               if (currentUser) {
                 authBtn.type = 'button';
-                authBtn.addEventListener('click', async function() { await supabase.auth.signOut(); });
+                authBtn.addEventListener('click', async function() {
+                  try {
+                    await supabase.auth.signOut({ scope: 'local' });
+                  } catch (err) {
+                    var em = String((err && err.message) || err || '');
+                    if (em.indexOf(SUPABASE_AUTH_LOCK_KEY) === -1) {
+                      console.warn('Sign-out warning:', err);
+                    }
+                  } finally {
+                    currentUser = null;
+                    isPaidUser = false;
+                    try { localStorage.removeItem('sb-vplpcitffpwsjdczsvnz-auth-token'); } catch (_) {}
+                    updateUI();
+                  }
+                });
               } else {
                 authBtn.href = '#';
                 authBtn.addEventListener('click', function(e) { e.preventDefault(); openAuthModal(); });
