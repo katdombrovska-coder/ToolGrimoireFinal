@@ -2325,10 +2325,27 @@ code {
 /* Responsive - mobile alignment */
 @media (max-width: 768px) {
   .nav-header {
-    width: 95%;
-    top: 12px;
-    padding: 12px 20px;
-    gap: 16px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    max-width: none;
+    transform: none;
+    top: 10px;
+    padding: 10px 14px;
+    gap: 10px;
+    justify-content: space-between;
+    border-radius: 20px;
+  }
+  .nav-header .hidden.md\:flex { display: none !important; }
+  .nav-header > div:first-child { min-width: 0; flex: 1 1 auto; }
+  .nav-header > div:first-child .px-4 { padding-left: 0 !important; padding-right: 0 !important; }
+  .nav-header .flex:first-child span.font-bold::after { font-size: 15px; }
+  .tg-nav-auth {
+    margin-left: auto !important;
+    padding: 8px 14px !important;
+    font-size: 13px !important;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   
   .hero-section {
