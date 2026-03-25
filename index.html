@@ -3642,14 +3642,16 @@ html {
             display: none;
             align-items: center;
             justify-content: center;
-            background: rgba(0,0,0,0.88);
+            background: rgba(0,0,0,0.62);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             padding: 24px;
           }
           #tg-prelogin-gate .tg-gate-card {
             width: 100%;
             max-width: 560px;
             text-align: center;
-            background: rgba(255,255,255,0.03);
+            background: #07050d;
             border: 1px solid rgba(124, 58, 237, 0.4);
             border-radius: 16px;
             padding: 44px 32px;
@@ -3687,20 +3689,58 @@ html {
             text-transform: uppercase;
             box-shadow: 0 2px 12px rgba(124, 58, 237, 0.4);
           }
-          #tg-prelogin-gate .tg-gate-title {
+          #tg-prelogin-gate .tg-gate-price {
             color: #fff;
-            font-size: 2rem;
+            font-size: 3.5rem;
             font-weight: 800;
-            margin: 12px 0 24px;
+            margin: 24px 0 26px;
+            letter-spacing: -1px;
             background: linear-gradient(135deg, #7C3AED 0%, #a78bfa 50%, #c4b5fd 100%);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
           }
+          #tg-prelogin-gate .tg-gate-heading {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #fff;
+          }
           #tg-prelogin-gate .tg-gate-sub {
-            color: #b0b0b0;
-            margin-bottom: 24px;
+            color: #777;
+            margin-bottom: 0;
             font-size: 0.95rem;
+          }
+          #tg-prelogin-gate .tg-gate-list {
+            list-style: none;
+            text-align: left;
+            color: #b0b0b0;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            margin: 0 0 16px;
+            padding-left: 0;
+            display: block;
+            margin-left: 0;
+            margin-right: auto;
+          }
+          #tg-prelogin-gate .tg-gate-list li {
+            display: flex;
+            align-items: flex-start;
+            text-align: left;
+          }
+          #tg-prelogin-gate .tg-gate-list li::before {
+            content: "✓ ";
+            color: #7C3AED;
+            font-weight: 700;
+            margin-right: 8px;
+            flex-shrink: 0;
+          }
+          #tg-prelogin-gate .tg-gate-urgency {
+            font-size: 0.85rem;
+            color: #666;
+            font-style: italic;
+            margin-bottom: 24px;
+            line-height: 1.5;
           }
           #tg-prelogin-gate .tg-gate-btn {
             display: inline-block;
@@ -3722,7 +3762,7 @@ html {
             box-shadow: 0 8px 35px rgba(124, 58, 237, 0.5);
           }
           #tg-prelogin-gate .tg-gate-note {
-            color: #7f7f7f;
+            color: #666;
             font-size: 0.8rem;
             margin-top: 12px;
           }
@@ -3737,15 +3777,15 @@ html {
           <div class="tg-modal-box" style="position: relative;">
             <button type="button" class="tg-close" id="tg-auth-close" aria-label="Close">&times;</button>
             <h2 class="tg-modal-title">Welcome</h2>
-            <p class="tg-modal-sub">Sign in or create an account to unlock full access.</p>
+            <p class="tg-modal-sub">Log in or create an account to unlock full access.</p>
             <div class="tg-tabs">
-              <button type="button" class="tg-tab tg-active" data-tg-tab="signin">Sign In</button>
+              <button type="button" class="tg-tab tg-active" data-tg-tab="signin">Log In</button>
               <button type="button" class="tg-tab" data-tg-tab="signup">Sign Up</button>
             </div>
             <form id="tg-auth-form">
               <input type="email" id="tg-auth-email" placeholder="Email" required autocomplete="email" />
               <input type="password" id="tg-auth-password" placeholder="Password" required autocomplete="current-password" />
-              <button type="submit" class="tg-btn-primary" id="tg-auth-submit">Sign In</button>
+              <button type="submit" class="tg-btn-primary" id="tg-auth-submit">Log In</button>
             </form>
             <button type="button" class="tg-btn-primary tg-btn-secondary" id="tg-auth-forgot" style="display:none;">Forgot password?</button>
             <div id="tg-auth-msg" class="tg-msg"></div>
@@ -3755,10 +3795,17 @@ html {
         <!-- Pre-login gate (free access) -->
         <div id="tg-prelogin-gate" aria-live="polite">
           <div class="tg-gate-card">
-            <span class="tg-gate-badge">Free Access</span>
-            <h2 style="color:#fff; font-size:1.9rem; font-weight:700; margin: 0 0 6px;">ToolGrimoire Access</h2>
-            <div class="tg-gate-title">Free</div>
-            <p class="tg-gate-sub">Create a free account to access all tools by category and trending picks.</p>
+            <span class="tg-gate-badge">All-In-One</span>
+            <h2 class="tg-gate-heading">ToolGrimoire Access</h2>
+            <p class="tg-gate-sub">Your shortcut to the entire AI tools landscape</p>
+            <div class="tg-gate-price">Free</div>
+            <ul class="tg-gate-list">
+              <li>400+ handpicked AI tools across 12+ categories</li>
+              <li>Updated weekly with new launches and hidden gems</li>
+              <li>Covers both mainstream and underground tools</li>
+              <li>Find the right tool in seconds, not hours</li>
+            </ul>
+            <p class="tg-gate-urgency">Join creators and developers already using ToolGrimoire</p>
             <button id="tg-gate-open-auth" class="tg-gate-btn" type="button">Get Access</button>
             <p class="tg-gate-note">Sign up once, then log in anytime with your email and password.</p>
           </div>
@@ -4082,7 +4129,7 @@ html {
               authBtn = document.createElement(currentUser ? 'button' : 'a');
               authBtn.id = 'tg-nav-auth-btn';
               authBtn.className = 'tg-nav-auth ' + (currentUser ? 'tg-signout' : 'tg-signin');
-              authBtn.textContent = currentUser ? 'Sign Out' : 'Sign In';
+              authBtn.textContent = currentUser ? 'Sign Out' : 'Log In';
               if (currentUser) {
                 authBtn.type = 'button';
                 authBtn.addEventListener('click', async function() { await supabase.auth.signOut(); });
@@ -4141,7 +4188,7 @@ html {
                 document.querySelectorAll('[data-tg-tab]').forEach(function(t) { t.classList.remove('tg-active'); });
                 this.classList.add('tg-active');
                 const isSignUp = this.getAttribute('data-tg-tab') === 'signup';
-                document.getElementById('tg-auth-submit').textContent = isSignUp ? 'Sign Up' : 'Sign In';
+                document.getElementById('tg-auth-submit').textContent = isSignUp ? 'Sign Up' : 'Log In';
                 document.getElementById('tg-auth-form').dataset.mode = isSignUp ? 'signup' : 'signin';
                 const forgotBtn = document.getElementById('tg-auth-forgot');
                 if (forgotBtn) forgotBtn.style.display = isSignUp ? 'none' : 'block';
@@ -4185,7 +4232,7 @@ html {
                 } else {
                   const { error } = await supabase.auth.signInWithPassword({ email, password });
                   if (error) throw error;
-                  setAuthMsg('Signed in successfully.', false);
+                  setAuthMsg('Logged in successfully.', false);
                   setTimeout(closeAuthModal, 800);
                 }
               } catch (err) {
