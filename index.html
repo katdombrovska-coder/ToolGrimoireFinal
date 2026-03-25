@@ -3634,6 +3634,102 @@ html {
           }
           .tg-unlock-banner .tg-btn-access:hover { background: #6d28d9; transform: translateY(-3px); box-shadow: 0 8px 28px rgba(124, 58, 237, 0.5); }
           .tg-unlock-banner .tg-btn-access:active { transform: scale(0.97); box-shadow: 0 2px 12px rgba(124, 58, 237, 0.5); }
+          body.tg-gate-active { overflow: hidden !important; }
+          #tg-prelogin-gate {
+            position: fixed;
+            inset: 0;
+            z-index: 9000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.88);
+            padding: 24px;
+          }
+          #tg-prelogin-gate .tg-gate-card {
+            width: 100%;
+            max-width: 560px;
+            text-align: center;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(124, 58, 237, 0.4);
+            border-radius: 16px;
+            padding: 44px 32px;
+            position: relative;
+            box-shadow: 0 0 30px rgba(124, 58, 237, 0.2);
+            animation: tg-gate-pulse 3s ease-in-out infinite;
+            overflow: hidden;
+            font-family: 'Montserrat', sans-serif;
+          }
+          #tg-prelogin-gate .tg-gate-card::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: 17px;
+            padding: 1px;
+            background: linear-gradient(90deg, transparent, rgba(167, 139, 250, 0.4), transparent, rgba(124, 58, 237, 0.4), transparent);
+            background-size: 200% 100%;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+            opacity: 0.9;
+          }
+          #tg-prelogin-gate .tg-gate-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #a78bfa 0%, #7C3AED 100%);
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            padding: 6px 14px;
+            border-radius: 9999px;
+            margin-bottom: 14px;
+            text-transform: uppercase;
+            box-shadow: 0 2px 12px rgba(124, 58, 237, 0.4);
+          }
+          #tg-prelogin-gate .tg-gate-title {
+            color: #fff;
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 12px 0 24px;
+            background: linear-gradient(135deg, #7C3AED 0%, #a78bfa 50%, #c4b5fd 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+          }
+          #tg-prelogin-gate .tg-gate-sub {
+            color: #b0b0b0;
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+          }
+          #tg-prelogin-gate .tg-gate-btn {
+            display: inline-block;
+            background: #7C3AED;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+            padding: 16px 32px;
+            font-size: 1rem;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s, box-shadow 0.3s;
+            box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
+          }
+          #tg-prelogin-gate .tg-gate-btn:hover {
+            background: #6d28d9;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 35px rgba(124, 58, 237, 0.5);
+          }
+          #tg-prelogin-gate .tg-gate-note {
+            color: #7f7f7f;
+            font-size: 0.8rem;
+            margin-top: 12px;
+          }
+          @keyframes tg-gate-pulse {
+            0%, 100% { box-shadow: 0 0 30px rgba(124, 58, 237, 0.2); border-color: rgba(124, 58, 237, 0.4); }
+            50% { box-shadow: 0 0 45px rgba(124, 58, 237, 0.35); border-color: rgba(124, 58, 237, 0.6); }
+          }
         </style>
 
         <!-- Auth modal -->
@@ -3651,7 +3747,20 @@ html {
               <input type="password" id="tg-auth-password" placeholder="Password" required autocomplete="current-password" />
               <button type="submit" class="tg-btn-primary" id="tg-auth-submit">Sign In</button>
             </form>
+            <button type="button" class="tg-btn-primary tg-btn-secondary" id="tg-auth-forgot" style="display:none;">Forgot password?</button>
             <div id="tg-auth-msg" class="tg-msg"></div>
+          </div>
+        </div>
+
+        <!-- Pre-login gate (free access) -->
+        <div id="tg-prelogin-gate" aria-live="polite">
+          <div class="tg-gate-card">
+            <span class="tg-gate-badge">Free Access</span>
+            <h2 style="color:#fff; font-size:1.9rem; font-weight:700; margin: 0 0 6px;">ToolGrimoire Access</h2>
+            <div class="tg-gate-title">Free</div>
+            <p class="tg-gate-sub">Create a free account to access all tools by category and trending picks.</p>
+            <button id="tg-gate-open-auth" class="tg-gate-btn" type="button">Get Access</button>
+            <p class="tg-gate-note">Sign up once, then log in anytime with your email and password.</p>
           </div>
         </div>
 
@@ -3965,6 +4074,7 @@ html {
 
             function updateUI() {
               setupFreemiumLayout();
+              updatePreloginGate();
               const nav = document.querySelector('.nav-header');
               let authBtn = document.getElementById('tg-nav-auth-btn');
               if (!nav) return;
@@ -3981,6 +4091,15 @@ html {
                 authBtn.addEventListener('click', function(e) { e.preventDefault(); openAuthModal(); });
               }
               nav.appendChild(authBtn);
+            }
+
+            function updatePreloginGate() {
+              const gate = document.getElementById('tg-prelogin-gate');
+              if (!gate) return;
+              const showGate = !currentUser;
+              gate.style.display = showGate ? 'flex' : 'none';
+              if (showGate) document.body.classList.add('tg-gate-active');
+              else document.body.classList.remove('tg-gate-active');
             }
 
             function openAuthModal() {
@@ -4001,6 +4120,9 @@ html {
 
             function runAfterMount() {
               initSupabase().catch(console.error);
+              if (new URLSearchParams(window.location.search).get('auth') === '1') {
+                setTimeout(function() { openAuthModal(); }, 350);
+              }
               function trySetup() {
                 if (document.querySelector('.product-card') && !document.getElementById('tg-featured-section')) setupFreemiumLayout();
                 if (!document.getElementById('tg-nav-auth-btn') && document.querySelector('.nav-header')) updateUI();
@@ -4013,6 +4135,7 @@ html {
 
             document.getElementById('tg-auth-close').addEventListener('click', closeAuthModal);
             document.getElementById('tg-auth-modal').addEventListener('click', function(e) { if (e.target === this) closeAuthModal(); });
+            document.getElementById('tg-gate-open-auth').addEventListener('click', function() { openAuthModal(); });
             document.querySelectorAll('[data-tg-tab]').forEach(function(tab) {
               tab.addEventListener('click', function() {
                 document.querySelectorAll('[data-tg-tab]').forEach(function(t) { t.classList.remove('tg-active'); });
@@ -4020,9 +4143,32 @@ html {
                 const isSignUp = this.getAttribute('data-tg-tab') === 'signup';
                 document.getElementById('tg-auth-submit').textContent = isSignUp ? 'Sign Up' : 'Sign In';
                 document.getElementById('tg-auth-form').dataset.mode = isSignUp ? 'signup' : 'signin';
+                const forgotBtn = document.getElementById('tg-auth-forgot');
+                if (forgotBtn) forgotBtn.style.display = isSignUp ? 'none' : 'block';
               });
             });
             document.getElementById('tg-auth-form').dataset.mode = 'signin';
+            document.getElementById('tg-auth-forgot').style.display = 'block';
+            document.getElementById('tg-auth-forgot').addEventListener('click', async function() {
+              const email = (document.getElementById('tg-auth-email').value || '').trim();
+              if (!email) {
+                setAuthMsg('Enter your email first.', true);
+                return;
+              }
+              if (!supabase) {
+                setAuthMsg('Initializing... please try again in a moment.', true);
+                return;
+              }
+              try {
+                const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                  redirectTo: window.location.origin + '/reset-password.html'
+                });
+                if (error) throw error;
+                setAuthMsg('Reset link sent. Check your email.', false);
+              } catch (err) {
+                setAuthMsg(err.message || 'Could not send reset email.', true);
+              }
+            });
             document.getElementById('tg-auth-form').addEventListener('submit', async function(e) {
               e.preventDefault();
               const email = document.getElementById('tg-auth-email').value.trim();
