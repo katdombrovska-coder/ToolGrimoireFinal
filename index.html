@@ -3612,11 +3612,11 @@ html {
           @media (max-width: 600px) { .tg-featured-grid { grid-template-columns: 1fr; } }
           .tg-trending-badge {
             position: absolute; top: 12px; right: 12px; z-index: 10;
-            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
+            background: linear-gradient(135deg, #a78bfa 0%, #7C3AED 100%);
             color: white; padding: 4px 10px; border-radius: 9999px;
             font-size: 0.7rem; font-weight: 700; letter-spacing: 0.5px;
             display: flex; align-items: center; gap: 4px;
-            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+            box-shadow: 0 2px 8px rgba(124, 58, 237, 0.35);
             font-family: 'Montserrat', sans-serif;
             animation: tg-badge-pulse 2s ease-in-out infinite;
           }
@@ -3927,14 +3927,29 @@ html {
             let hasKnownUser = false;
             let gateDelayElapsed = false;
 
+            function isKnownSupabaseLockError(input) {
+              var msg = String((input && input.message) || input || '').toLowerCase();
+              return msg.indexOf(SUPABASE_AUTH_LOCK_KEY.toLowerCase()) !== -1 ||
+                (msg.indexOf('auth-token') !== -1 && msg.indexOf('another request stole it') !== -1);
+            }
+
             // In local/dev, multiple concurrent auth clients can race on the same
-            // storage lock. This prevents noisy uncaught overlay for this known case.
+            // storage lock. Suppress this known noise before runtime overlay catches it.
             window.addEventListener('unhandledrejection', function(e) {
-              var msg = String((e && e.reason && e.reason.message) || (e && e.reason) || '');
-              if (msg.indexOf(SUPABASE_AUTH_LOCK_KEY) !== -1) {
+              var reason = (e && e.reason) || '';
+              if (isKnownSupabaseLockError(reason)) {
                 e.preventDefault();
+                if (e.stopImmediatePropagation) e.stopImmediatePropagation();
               }
-            });
+            }, true);
+            window.addEventListener('error', function(e) {
+              var err = (e && (e.error || e.message)) || '';
+              if (isKnownSupabaseLockError(err)) {
+                e.preventDefault();
+                if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+                return false;
+              }
+            }, true);
 
             function markKnownUser() {
               hasKnownUser = true;
